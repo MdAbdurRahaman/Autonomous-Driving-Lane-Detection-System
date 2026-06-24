@@ -72,15 +72,11 @@ def overlay_lane_mask(
     colored_mask[binary_mask == 1] = color
     
     # Perform alpha blending where the lane is detected
+    blended = cv2.addWeighted(image, 1.0 - alpha, colored_mask, alpha, 0.0)
+    
     overlay_img = image.copy()
     mask_indices = binary_mask == 1
-    overlay_img[mask_indices] = cv2.addWeighted(
-        image[mask_indices],
-        1.0 - alpha,
-        colored_mask[mask_indices],
-        alpha,
-        0
-    )
+    overlay_img[mask_indices] = blended[mask_indices]
     
     return overlay_img
 

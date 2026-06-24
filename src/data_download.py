@@ -31,11 +31,11 @@ OFFICIAL_URLS = {
 
 # Curated high-quality highway images with lanes from public lane detection repos
 SAMPLE_IMAGE_URLS = [
-    "https://raw.githubusercontent.com/amusi/Lane-Detection-Benchmark/master/images/tusimple.jpg",
-    "https://raw.githubusercontent.com/MaybeShewill-cv/lanenet-lane-detection/master/data/tusimple_test_image/tusimple_test_image.jpg",
-    "https://raw.githubusercontent.com/voldemortX/pytorch-auto-drive/master/demo/demo.jpg",
-    "https://raw.githubusercontent.com/koyeongmin/PINet/master/test_gif/1.jpg",
-    "https://raw.githubusercontent.com/cfzd/Ultra-Fast-Lane-Detection/master/assets/tusimple_eval.png"
+    "https://raw.githubusercontent.com/MaybeShewill-CV/lanenet-lane-detection/master/data/tusimple_test_image/0.jpg",
+    "https://raw.githubusercontent.com/MaybeShewill-CV/lanenet-lane-detection/master/data/tusimple_test_image/1.jpg",
+    "https://raw.githubusercontent.com/MaybeShewill-CV/lanenet-lane-detection/master/data/tusimple_test_image/2.jpg",
+    "https://raw.githubusercontent.com/MaybeShewill-CV/lanenet-lane-detection/master/data/tusimple_test_image/3.jpg",
+    "https://raw.githubusercontent.com/MaybeShewill-CV/lanenet-lane-detection/master/data/tusimple_test_image/4.jpg"
 ]
 
 
@@ -91,13 +91,13 @@ def create_sample_dataset(data_dir: str) -> None:
                 import numpy as np
                 from PIL import Image
                 dummy_img = np.zeros((720, 1280, 3), dtype=np.uint8)
-                # Paint mock lanes
-                for y in range(240, 720):
-                    # Left lane line
-                    xl = int(350 + (y - 240) * 0.5)
+                # Paint mock lanes with correct perspective
+                for y in range(350, 720):
+                    # Left lane line (drifts left as it goes down)
+                    xl = int(550 - (y - 300) * 0.85)
                     dummy_img[y, xl-5:xl+5] = [255, 255, 255]
-                    # Right lane line
-                    xr = int(930 - (y - 240) * 0.5)
+                    # Right lane line (drifts right as it goes down)
+                    xr = int(730 + (y - 300) * 0.85)
                     dummy_img[y, xr-5:xr+5] = [255, 255, 255]
                 Image.fromarray(dummy_img).save(dest_img_path)
                 logger.info(f"Saved black placeholder with mock lanes to {dest_img_path}")
@@ -105,13 +105,11 @@ def create_sample_dataset(data_dir: str) -> None:
                 logger.error(f"Cannot generate placeholder image: {placeholder_err}")
                 raise placeholder_err
         
-        # Generate TuSimple-compatible annotations
-        # TuSimple represents lanes as coordinates corresponding to h_samples.
-        # We will construct left and right lane lines.
-        # Left lane drifts from 350 (at h=240) to 590 (at h=710)
-        # Right lane drifts from 930 (at h=240) to 690 (at h=710)
-        left_lane = [int(350 + (h - 240) * 0.5) for h in h_samples]
-        right_lane = [int(930 - (h - 240) * 0.5) for h in h_samples]
+        # Generate TuSimple-compatible annotations matching real highway perspective
+        # Left lane converges near center (550 at y=300) and diverges at bottom (202 at y=710)
+        # Right lane converges near center (730 at y=300) and diverges at bottom (1078 at y=710)
+        left_lane = [int(550 - (h - 300) * 0.85) if h >= 350 else -2 for h in h_samples]
+        right_lane = [int(730 + (h - 300) * 0.85) if h >= 350 else -2 for h in h_samples]
         
         # Hide the lane points at the top (horizon) as in real data
         for k in range(len(h_samples)):
