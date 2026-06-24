@@ -1,0 +1,29 @@
+dataset:
+  root_dir: "data"
+  img_height: 256
+  img_width: 512
+  batch_size: 4
+  num_workers: 0
+  train_json: "label_data_0313.json"
+  val_json: "label_data_0531.json"
+  test_json: "test_label.json"
+
+model:
+  type: "unet"  # Options: unet, deeplabv3
+
+training:
+  epochs: 10
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  device: "cuda"  # Auto fallbacks to cpu if cuda not available
+  val_split: 0.2
+  seed: 42
+
+mlflow:
+  experiment_name: "Autonomous_Lane_Detection"
+  tracking_uri: "mlruns"
+
+paths:
+  checkpoint_dir: "models"
+  artifact_dir: "artifacts"
+  output_dir: "outputs"

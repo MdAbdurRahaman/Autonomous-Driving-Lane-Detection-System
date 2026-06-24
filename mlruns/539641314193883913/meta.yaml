@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/Abdur R/Documents/Projects/Autonomous Driving
+  Lane Detection System/mlruns/539641314193883913
+creation_time: 1782247628521
+effective_trace_archival_retention: null
+experiment_id: '539641314193883913'
+last_update_time: 1782247628521
+lifecycle_stage: active
+name: Autonomous_Lane_Detection
+trace_location: null
+workspace: default

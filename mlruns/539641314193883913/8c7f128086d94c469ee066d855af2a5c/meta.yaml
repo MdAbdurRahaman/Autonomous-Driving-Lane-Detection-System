@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Abdur R/Documents/Projects/Autonomous Driving Lane
+  Detection System/mlruns/539641314193883913/8c7f128086d94c469ee066d855af2a5c/artifacts
+end_time: 1782251040394
+entry_point_name: ''
+experiment_id: '539641314193883913'
+lifecycle_stage: active
+run_id: 8c7f128086d94c469ee066d855af2a5c
+run_name: DEEPLABV3_LR_0.0005_BS_4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1782251004585
+status: 4
+tags: []
+user_id: Abdur R
