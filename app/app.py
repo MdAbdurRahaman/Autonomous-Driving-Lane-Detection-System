@@ -107,7 +107,7 @@ def load_trained_model(model_type: str, config: dict, device: torch.device):
         return None
     try:
         model = build_model(model_type, pretrained=False)
-        model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+        model.load_state_dict(torch.load(checkpoint_path, map_location=device), strict=False)
         model = model.to(device)
         model.eval()
         return model
@@ -263,6 +263,7 @@ def main():
             st.markdown("### Settings")
             model_type = st.selectbox("Model Architecture", ["unet", "deeplabv3"])
             alpha = st.slider("Overlay Transparency (Alpha)", 0.1, 1.0, 0.4, 0.05)
+            prob_threshold = st.slider("Confidence Threshold", 0.05, 0.95, 0.30, 0.05)
             
             # Load selected model
             model = load_trained_model(model_type, config, device)
@@ -283,7 +284,7 @@ def main():
             if model is not None:
                 img_h = config["dataset"]["img_height"]
                 img_w = config["dataset"]["img_width"]
-                mask = predict_mask(model, image_rgb, img_h, img_w, device)
+                mask = predict_mask(model, image_rgb, img_h, img_w, device, threshold=prob_threshold)
             else:
                 # Mock mask generation if weights don't exist
                 h_img, w_img = image_rgb.shape[:2]
@@ -295,7 +296,7 @@ def main():
             inference_ms = (time.time() - t0) * 1000
             
             # Generate Overlay
-            overlay = overlay_lane_mask(image_rgb, mask, color=(0, 255, 0), alpha=alpha)
+            overlay = overlay_lane_mask(image_rgb, mask, color=(255, 255, 0), alpha=alpha)
             
             # Visual Layout
             col1, col2, col3 = st.columns(3)
@@ -332,6 +333,7 @@ def main():
         st.markdown("<p style='color:#8b949e;'>Upload a dashcam driving video to segment road lanes frame-by-frame.</p>", unsafe_allow_html=True)
         
         model_type = st.selectbox("Inference Model", ["unet", "deeplabv3"], key="vid_model")
+        prob_threshold = st.slider("Confidence Threshold", 0.05, 0.95, 0.30, 0.05, key="vid_thresh")
         model = load_trained_model(model_type, config, device)
         
         uploaded_video = st.file_uploader("Upload driving video...", type=["mp4", "avi", "mov"])
@@ -376,7 +378,7 @@ def main():
                 if model is not None:
                     img_h = config["dataset"]["img_height"]
                     img_w = config["dataset"]["img_width"]
-                    mask = predict_mask(model, frame_rgb, img_h, img_w, device)
+                    mask = predict_mask(model, frame_rgb, img_h, img_w, device, threshold=prob_threshold)
                 else:
                     # Mock mask (drifting diagonal stripes)
                     mask = np.zeros((frame_height, frame_width), dtype=np.uint8)
@@ -384,11 +386,11 @@ def main():
                     cv2.line(mask, (int(frame_width*0.75), frame_height), (int(frame_width*0.53), int(frame_height*0.55)), 1, 15)
                     
                 # Overlay
-                overlay = overlay_lane_mask(frame_rgb, mask, color=(0, 255, 0), alpha=0.4)
+                overlay = overlay_lane_mask(frame_rgb, mask, color=(255, 255, 0), alpha=0.4)
                 overlay_bgr = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
                 
                 # Add overlay text
-                cv2.putText(overlay_bgr, f"Model: {model_type.upper()}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(overlay_bgr, f"Model: {model_type.upper()}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
                 cv2.putText(overlay_bgr, f"Frame: {frame_idx}/{max_process_frames}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
                 
                 out.write(overlay_bgr)

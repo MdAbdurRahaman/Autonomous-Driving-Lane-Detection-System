@@ -1,0 +1,9 @@
+artifact_location: file:///C:/Users/USER/Downloads/ar/Autonomous-Driving-Lane-Detection-System-main/mlruns/963008034648341552
+creation_time: 1782366589527
+effective_trace_archival_retention: null
+experiment_id: '963008034648341552'
+last_update_time: 1782366589527
+lifecycle_stage: active
+name: Autonomous_Lane_Detection
+trace_location: null
+workspace: default

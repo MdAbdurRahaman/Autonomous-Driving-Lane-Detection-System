@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/USER/Downloads/ar/Autonomous-Driving-Lane-Detection-System-main/mlruns/963008034648341552/9071cdb393134609a115557384a91994/artifacts
+end_time: 1782367648946
+entry_point_name: ''
+experiment_id: '963008034648341552'
+lifecycle_stage: active
+run_id: 9071cdb393134609a115557384a91994
+run_name: DEEPLABV3_LR_0.0005_BS_4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1782367154812
+status: 3
+tags: []
+user_id: USER

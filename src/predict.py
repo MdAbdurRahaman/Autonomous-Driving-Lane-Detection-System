@@ -54,7 +54,8 @@ def predict_mask(
     image_rgb: np.ndarray,
     height: int,
     width: int,
-    device: torch.device
+    device: torch.device,
+    threshold: float = 0.5
 ) -> np.ndarray:
     """
     Runs model inference on an image and returns the binary mask.
@@ -75,7 +76,7 @@ def predict_mask(
     prob_resized = cv2.resize(prob, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR)
     
     # Threshold to create binary mask
-    binary_mask = (prob_resized > 0.5).astype(np.uint8)
+    binary_mask = (prob_resized > threshold).astype(np.uint8)
     return binary_mask
 
 
@@ -102,7 +103,7 @@ def process_image(
     mask = predict_mask(model, image_rgb, height, width, device)
     
     # Create overlay
-    overlay = overlay_lane_mask(image_rgb, mask, color=(0, 255, 0), alpha=0.4)
+    overlay = overlay_lane_mask(image_rgb, mask, color=(255, 255, 0), alpha=0.4)
     overlay_bgr = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
     
     # Prepare save names
@@ -163,14 +164,14 @@ def process_video(
         inference_time = (time.time() - t0) * 1000  # in ms
         
         # Overlay
-        overlay = overlay_lane_mask(frame_rgb, mask, color=(0, 255, 0), alpha=0.4)
+        overlay = overlay_lane_mask(frame_rgb, mask, color=(255, 255, 0), alpha=0.4)
         overlay_bgr = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
         
         # Add telemetry metadata text overlay
         fps_info = f"Inference: {inference_time:.1f}ms ({1000 / (inference_time + 1e-5):.1f} FPS)"
         cv2.putText(
             overlay_bgr, fps_info, (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv2.LINE_AA
+            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA
         )
         cv2.putText(
             overlay_bgr, "Autonomous Lane Detection System", (10, 60),
